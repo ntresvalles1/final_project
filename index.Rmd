@@ -30,7 +30,10 @@ library(tidyverse)
 library(sf)
 library(httr)
 library(jsonlite)
-
+library(usethis)
+library(devtools)
+remotes::install_github("mfherman/nycgeo")
+library(nycgeo)
 ```
 
 ```{r}
@@ -38,10 +41,19 @@ library(jsonlite)
 res = GET("https://data.cityofnewyork.us/resource/f55k-p6yu.json")
 nyc_accidents = fromJSON(rawToChar(res$content))
 
-
 #SF for Bike Routes
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
+
+nyc_puma <- nyc_boundaries(geography = "puma") %>%
+  rename(GEOID=geoid)
+
+ggplot() +
+  geom_sf(data= nyc_puma) +
+  geom_sf(data = bike_routes, col = "blue") +
+  theme(panel.background = element_rect(fill = "aliceblue"))
+  
+
 ```
 
 
