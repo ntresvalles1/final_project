@@ -1,6 +1,6 @@
 ---
 title: "More information"
-author: "Guy Incognito"
+author: "Nicole Tresvalles, Karen Galvan"
 date: "Last updated on `r Sys.Date()`"
 output:
   html_document:
