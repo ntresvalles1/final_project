@@ -24,8 +24,6 @@ Write an intro `index.html` page in blog-post style that summarizes your work. I
 1. No more than 200 words of text
 
 ```{r, echo = FALSE}
-
-
 library(tidyverse)
 library(sf)
 library(httr)
@@ -34,14 +32,22 @@ library(usethis)
 library(devtools)
 remotes::install_github("mfherman/nycgeo")
 library(nycgeo)
+library(leaflet)
+#library(rgeos)
 ```
 
-```{r}
+```{r, echo = FALSE}
 #Accidents Data
-res = GET("https://data.cityofnewyork.us/resource/f55k-p6yu.json")
-nyc_accidents = fromJSON(rawToChar(res$content))
+#res = GET("https://data.cityofnewyork.us/resource/f55k-p6yu.json")
+#nyc_accidents = fromJSON(rawToChar(res$content))
+# Filtered nyc accidents to bicyclist
+nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv") %>% 
+  filter(PERSON_TYPE == "Bicyclist")
 
-#SF for Bike Routes
+people_injured <- nyc_accidents_filtered %>% 
+  filter(PERSON_INJURY == "Injured")
+  
+# SF for Bike Routes
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
 
@@ -53,7 +59,27 @@ ggplot() +
   geom_sf(data = bike_routes, col = "blue") +
   theme(panel.background = element_rect(fill = "aliceblue"))
   
-
 ```
 
 
+```{r, echo = FALSE}
+# Make leaflet with the bike routes
+bike_routes_leaflet <- st_transform(bike_routes, 4326)
+
+nyc_bikemiles_leaflet <- leaflet(bike_routes_leaflet) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addPolygons(color = "red", weight = 2) 
+  #addTiles() %>%
+  #addMarkers(lng=-74.0060, lat=40.7128, popup="New York City - City Hall") %>% 
+
+nyc_bikemiles_leaflet  # Print the map
+```
+
+```{r}
+#people_injured_in <- people_injured %>% 
+ # inner_join()
+
+#people_injured_leaflet <- st_transform(people_injured, 4326)
+
+
+```
