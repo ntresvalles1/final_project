@@ -41,6 +41,8 @@ library(nycgeo)
 res = GET("https://data.cityofnewyork.us/resource/f55k-p6yu.json")
 nyc_accidents = fromJSON(rawToChar(res$content))
 
+nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv") 
+
 #SF for Bike Routes
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
