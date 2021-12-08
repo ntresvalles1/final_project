@@ -49,10 +49,6 @@ nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv"
 people_injured <- nyc_accidents_filtered %>% 
   filter(PERSON_INJURY == "Injured") %>%
 
-people_injured$CRASH_DATE <- as.Date(as.character(people_injured$CRASH_DATE), format = "%m/%d/%Y")
-
-
-# SF for Bike Routes
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
 
