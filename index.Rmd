@@ -24,8 +24,6 @@ Write an intro `index.html` page in blog-post style that summarizes your work. I
 1. No more than 200 words of text
 
 ```{r, echo = FALSE}
-
-
 library(tidyverse)
 library(sf)
 library(httr)
@@ -34,16 +32,23 @@ library(usethis)
 library(devtools)
 remotes::install_github("mfherman/nycgeo")
 library(nycgeo)
+library(leaflet)
+library(lubridate)
+
+#library(rgeos)
 ```
 
-```{r}
+```{r, echo = FALSE}
 #Accidents Data
-res = GET("https://data.cityofnewyork.us/resource/f55k-p6yu.json")
-nyc_accidents = fromJSON(rawToChar(res$content))
+#res = GET("https://data.cityofnewyork.us/resource/f55k-p6yu.json")
+#nyc_accidents = fromJSON(rawToChar(res$content))
+# Filtered nyc accidents to bicyclist
+nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv") %>% 
+  filter(PERSON_TYPE == "Bicyclist")
 
-nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv") 
+people_injured <- nyc_accidents_filtered %>% 
+  filter(PERSON_INJURY == "Injured") %>%
 
-#SF for Bike Routes
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
 
@@ -55,7 +60,35 @@ ggplot() +
   geom_sf(data = bike_routes, col = "blue") +
   theme(panel.background = element_rect(fill = "aliceblue"))
   
-
 ```
 
 
+```{r, echo = FALSE}
+# Make leaflet with the bike routes
+bike_routes_leaflet <- st_transform(bike_routes, 4326)
+
+nyc_bikemiles_leaflet <- leaflet(bike_routes_leaflet) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addPolygons(color = "red", weight = 2) 
+  #addTiles() %>%
+  #addMarkers(lng=-74.0060, lat=40.7128, popup="New York City - City Hall") %>% 
+
+nyc_bikemiles_leaflet  # Print the map
+```
+
+```{r}
+
+bicycle_accidents <- read.csv('accidents_bicyclists_.csv')
+
+bike_accidents_location <- bicycle_accidents %>% 
+  left_join(people_injured, id="COLLISION_ID", na.rm=TRUE) %>% 
+  filter(!is.na(LATITUDE), !is.na(LONGITUDE), LOCATION !=	"(0.0, 0.0)", CRASH_DATE <= "2019-12-31" & CRASH_DATE >= "2019-01-01") %>% 
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = st_crs(4326))
+
+
+ggplot() +
+  geom_sf(data= nyc_puma) +
+  geom_sf(data = bike_accidents_location) +
+  theme(panel.background = element_rect(fill = "aliceblue"))
+
+```
