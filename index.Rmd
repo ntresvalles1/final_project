@@ -33,6 +33,8 @@ library(devtools)
 remotes::install_github("mfherman/nycgeo")
 library(nycgeo)
 library(leaflet)
+library(lubridate)
+
 #library(rgeos)
 ```
 
@@ -45,8 +47,11 @@ nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv"
   filter(PERSON_TYPE == "Bicyclist")
 
 people_injured <- nyc_accidents_filtered %>% 
-  filter(PERSON_INJURY == "Injured")
-  
+  filter(PERSON_INJURY == "Injured") %>%
+
+people_injured$CRASH_DATE <- as.Date(as.character(people_injured$CRASH_DATE), format = "%m/%d/%Y")
+
+
 # SF for Bike Routes
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
@@ -76,10 +81,18 @@ nyc_bikemiles_leaflet  # Print the map
 ```
 
 ```{r}
-#people_injured_in <- people_injured %>% 
- # inner_join()
 
-#people_injured_leaflet <- st_transform(people_injured, 4326)
+bicycle_accidents <- read.csv('accidents_bicyclists_.csv')
 
+bike_accidents_location <- bicycle_accidents %>% 
+  left_join(people_injured, id="COLLISION_ID", na.rm=TRUE) %>% 
+  filter(!is.na(LATITUDE), !is.na(LONGITUDE), LOCATION !=	"(0.0, 0.0)", CRASH_DATE <= "2019-12-31" & CRASH_DATE >= "2019-01-01") %>% 
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = st_crs(4326))
+
+
+ggplot() +
+  geom_sf(data= nyc_puma) +
+  geom_sf(data = bike_accidents_location) +
+  theme(panel.background = element_rect(fill = "aliceblue"))
 
 ```
