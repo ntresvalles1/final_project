@@ -49,9 +49,14 @@ nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv"
   filter(PERSON_TYPE == "Bicyclist")
 
 people_injured <- nyc_accidents_filtered %>% 
+<<<<<<< HEAD
   filter(PERSON_INJURY == "Injured") 
 
 # SF for Bike Routes
+=======
+  filter(PERSON_INJURY == "Injured") %>%
+
+>>>>>>> dd2badc00fe6c3bf7cf6483a6c898d5295da3d8e
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
 
