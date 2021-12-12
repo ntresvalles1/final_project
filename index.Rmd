@@ -49,22 +49,20 @@ nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv"
   filter(PERSON_TYPE == "Bicyclist")
 
 people_injured <- nyc_accidents_filtered %>% 
-<<<<<<< HEAD
   filter(PERSON_INJURY == "Injured") 
 
 # SF for Bike Routes
-=======
-  filter(PERSON_INJURY == "Injured") %>%
-
->>>>>>> dd2badc00fe6c3bf7cf6483a6c898d5295da3d8e
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
 
-nyc_puma <- nyc_boundaries(geography = "puma") %>%
-  rename(GEOID=geoid)
+borough_ntas <- nyc_boundaries(
+  geography = "nta",
+  filter_by = "borough",
+  region = c("brooklyn", "queens", "manhattan", "staten island", "bronx")
+  )
 
 ggplot() +
-  geom_sf(data= nyc_puma) +
+  geom_sf(data= borough_ntas) +
   geom_sf(data = bike_routes, col = "blue") +
   theme(panel.background = element_rect(fill = "aliceblue"))
   
@@ -101,22 +99,22 @@ bike_accidents_location$CRASH.DATE <- as.Date(bike_accidents_location$CRASH.DATE
 bike_accidents_location <- bike_accidents_location %>% 
   mutate(month = month(CRASH.DATE), year = year(CRASH.DATE))
 
-puma_accidents <- nyc_point_poly(bike_accidents_location, "puma") %>%
+borough_accidents <- nyc_point_poly(bike_accidents_location, "nta") %>%
   st_set_geometry(NULL) %>%
   group_by(year) %>%
-  count(puma_name, puma_id) %>%
+  count(nta_name, nta_id) %>%
   rename(count = n)
 
-bike_puma_accidents_final <- left_join(nyc_puma, puma_accidents)
+bike_borough_accidents_final <- left_join(borough_ntas, borough_accidents)
 
-bike_puma_accidents_final <- bike_puma_accidents_final %>% 
+bike_borough_accidents_final <- bike_borough_accidents_final %>% 
   filter(year=="2019" | year=="2020" | year=="2021")
   na.omit(puma_accidents)
 
 ggplot() +
-  geom_sf(data= bike_puma_accidents_final, aes(fill = count), size = 0.5) +
+  geom_sf(data= bike_borough_accidents_final, aes(fill = count), size = 0.5) +
   theme(panel.background = element_rect(fill = "aliceblue")) +
-  facet_grid(~ year)+ 
+  facet_grid(~ borough)+ 
   scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
   labs(fill="Accident frequency",title="Bike accidents in NYC", subtitle = "Organized by public use microdata areas") +
   theme(axis.text.x = element_blank(),
