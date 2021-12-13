@@ -55,12 +55,14 @@ people_injured <- nyc_accidents_filtered %>%
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
 
+#maps for the boroughs
 borough_ntas <- nyc_boundaries(
   geography = "nta",
   filter_by = "borough",
   region = c("brooklyn", "queens", "manhattan", "staten island", "bronx")
   )
 
+#bike routes map
 ggplot() +
   geom_sf(data= borough_ntas) +
   geom_sf(data = bike_routes, col = "blue") +
@@ -86,39 +88,169 @@ nyc_bikemiles_leaflet  # Print the map
 
 bicycle_accidents <- read_csv('accidents_bicyclists_.csv')
 
+#Filters out bike accidents without proper latitude/longitude--------------
+
 bike_accidents_location <- bicycle_accidents %>% 
   left_join(people_injured, id="COLLISION_ID", na.rm=TRUE) %>% 
   filter(!is.na(LATITUDE), !is.na(LONGITUDE), LOCATION !=	"(0.0, 0.0)") %>% 
   st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = st_crs(4326))
 
+#Fixes wrong date on the CRASH.DATE column--------------
 bike_accidents_location <- bike_accidents_location %>% 
   mutate(CRASH.DATE=CRASH_DATE) 
 
+#Formats date correctly on the CRASH.DATE variable--------------
 bike_accidents_location$CRASH.DATE <- as.Date(bike_accidents_location$CRASH.DATE, format = '%m/%d/%Y')
 
+#Creates month and year variables--------------
 bike_accidents_location <- bike_accidents_location %>% 
   mutate(month = month(CRASH.DATE), year = year(CRASH.DATE))
 
+#Counts accidents in each nta--------------
 borough_accidents <- nyc_point_poly(bike_accidents_location, "nta") %>%
   st_set_geometry(NULL) %>%
   group_by(year) %>%
   count(nta_name, nta_id) %>%
   rename(count = n)
 
+#Creates maps for each borough--------------
+mn_ntas <- nyc_boundaries(
+  geography = "nta",
+  filter_by = "borough",
+  region = c("manhattan")
+  )
+
+qns_ntas <- nyc_boundaries(
+  geography = "nta",
+  filter_by = "borough",
+  region = c("queens")
+  )
+
+bk_ntas <- nyc_boundaries(
+  geography = "nta",
+  filter_by = "borough",
+  region = c("brooklyn")
+  )
+
+stat_ntas <- nyc_boundaries(
+  geography = "nta",
+  filter_by = "borough",
+  region = c("staten island")
+  )
+
+bx_ntas <- nyc_boundaries(
+  geography = "nta",
+  filter_by = "borough",
+  region = c("bronx")
+  )
+
+#Joins map of all boroughs with accident data--------------
 bike_borough_accidents_final <- left_join(borough_ntas, borough_accidents)
 
+#Filters previous df for '19,'20,'21 and non NA data--------------
 bike_borough_accidents_final <- bike_borough_accidents_final %>% 
   filter(year=="2019" | year=="2020" | year=="2021")
   na.omit(puma_accidents)
 
+#Because we couldn't make a map that could facet and scale the individual boroughs
+#using the original 'borough_accidents' df, (coord_sf doesn't support scale=free) we made individual dfs for each borough
+
+#Creates dfs for each borough, filters for '19,'20,'21 and non NA data--------------
+mn_accidents <- left_join(mn_ntas, borough_accidents) %>% 
+  filter(year=="2019" | year=="2020" | year=="2021") %>% 
+  mutate(discrete_count = cut(count, 5))
+
+qns_accidents <- left_join(qns_ntas, borough_accidents) %>% 
+  filter(year=="2019" | year=="2020" | year=="2021")
+
+bk_accidents <- left_join(bk_ntas, borough_accidents) %>% 
+  filter(year=="2019" | year=="2020" | year=="2021")
+
+stat_accidents <- left_join(stat_ntas, borough_accidents) %>% 
+  filter(year=="2019" | year=="2020" | year=="2021")
+
+bx_accidents <- left_join(bx_ntas, borough_accidents) %>% 
+  filter(year=="2019" | year=="2020" | year=="2021")
+
+#Creates maps for each borough dataframe-------------------------------------
+  
+#ggplot() +
+#  geom_sf(data= bike_borough_accidents_final, aes(fill = count), size = 0.5) +
+#  theme(panel.background = element_rect(fill = "aliceblue")) +
+#  facet_grid(~ borough_name)+ 
+#  scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
+#  labs(fill="Accident frequency",title="Bike accidents in NYC", subtitle = "Organized by neighborhood tabulation areas") +
+#  theme(axis.text.x = element_blank(),
+#        axis.text.y = element_blank(),
+#        axis.ticks = element_blank(),
+#        rect = element_blank())
+
+#Manhattan-------------------------------------
+
+
+
 ggplot() +
-  geom_sf(data= bike_borough_accidents_final, aes(fill = count), size = 0.5) +
+  geom_sf(data= mn_ntas) +
+  geom_sf(data= mn_accidents, aes(fill = discrete_count), size = 0.5) +
   theme(panel.background = element_rect(fill = "aliceblue")) +
-  facet_grid(~ borough)+ 
+  facet_grid(~ year)+ 
   scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
-  labs(fill="Accident frequency",title="Bike accidents in NYC", subtitle = "Organized by public use microdata areas") +
+  labs(fill="Accident frequency",title="Bike accidents in Manhattan", subtitle = "Organized by neighborhood tabulation area") +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         rect = element_blank())
+
+#Bronx-------------------------------------
+ggplot() +
+  geom_sf(data= bx_ntas) +
+  geom_sf(data= bx_accidents, aes(fill = count), size = 0.5) +
+  theme(panel.background = element_rect(fill = "aliceblue")) +
+  facet_grid(~ year)+ 
+  scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
+  labs(fill="Accident frequency",title="Bike accidents in the Bronx", subtitle = "Organized by neighborhood tabulation area") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+#Queens (best borough)-------------------------------------
+ggplot() +
+  geom_sf(data=qns_ntas) +
+  geom_sf(data= qns_accidents, aes(fill = count)) +
+  theme(panel.background = element_rect(fill = "aliceblue")) +
+  facet_grid(~ year)+ 
+  scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
+  labs(fill="Accident frequency",title="Bike accidents in Queens", subtitle = "Organized by neighborhood tabulation area") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+#Brooklyn-------------------------------------
+ggplot() +
+  geom_sf(data=bk_ntas) +
+  geom_sf(data= bk_accidents, aes(fill = count), size = 0.5) +
+  theme(panel.background = element_rect(fill = "aliceblue")) +
+  facet_grid(~ year)+ 
+  scale_fill_gradient(low = "#56B1F7", high = "#132B43") + 
+  labs(fill="Accident frequency",title="Bike accidents in Brooklyn", subtitle = "Organized by neighborhood tabulation area") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+#Staten Island-------------------------------------
+ggplot() +
+  geom_sf(data= stat_ntas) +
+  geom_sf(data= stat_accidents, aes(fill = count), size = 0.5) +
+  theme(panel.background = element_rect(fill = "aliceblue")) +
+  facet_grid(~ year)+ 
+  scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
+  labs(fill="Accident frequency",title="Bike accidents in Staten Island", subtitle = "Organized by neighborhood tabulation area") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
 ```
