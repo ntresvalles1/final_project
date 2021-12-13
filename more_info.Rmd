@@ -23,26 +23,9 @@ Write your "more information" section here.
 Write a second `more_info.html` page going more in-depth for people who want more details. In should have
 
 1. Between 2-3 more visualizations.
-1. No more than 500 words of text
-
-# Leaflet Map
+2. No more than 500 words of text
 
 ```{r, echo = FALSE}
-# Make leaflet with the bike routes
-bike_routes_leaflet <- st_transform(bike_routes, 4326)
-
-nyc_bikemiles_leaflet <- leaflet(bike_routes_leaflet) %>%
-  addProviderTiles(providers$CartoDB.Positron) %>% 
-  addPolygons(color = "red", weight = 2) 
-  #addTiles() %>%
-  #addMarkers(lng=-74.0060, lat=40.7128, popup="New York City - City Hall") %>% 
-
-nyc_bikemiles_leaflet  # Print the map
-```
-
-# Choropleth Map of Each Borough
-```{r}
-
 bicycle_accidents <- read_csv('accidents_bicyclists_.csv')
 
 #Filters out bike accidents without proper latitude/longitude--------------
@@ -71,6 +54,12 @@ borough_accidents <- nyc_point_poly(bike_accidents_location, "nta") %>%
   rename(count = n)
 
 #Creates maps for each borough--------------
+nyc_ntas <- nyc_boundaries(
+  geography = "nta",
+  filter_by = "borough",
+  region = c("queens", "brooklyn", "staten island", "bronx", "manhattan")
+  )
+
 mn_ntas <- nyc_boundaries(
   geography = "nta",
   filter_by = "borough",
@@ -112,6 +101,44 @@ bike_borough_accidents_final <- bike_borough_accidents_final %>%
 #using the original 'borough_accidents' df, (coord_sf doesn't support scale=free) we made individual dfs for each borough
 
 #Creates dfs for each borough, filters for '19,'20,'21 and non NA data--------------
+nyc_accidents <- left_join(nyc_ntas, borough_accidents) %>% 
+  filter(year=="2019" | year=="2020" | year=="2021")
+
+nyc_qt <- classIntervals(c(min(nyc_accidents$count), nyc_accidents$count), n = 5, style = "pretty")
+nyc_accidents <- nyc_accidents %>% 
+  mutate(accident_count = cut(count, nyc_qt$brks))
+
+```
+
+
+
+# Leaflet Map of Bicycle Trails
+```{r, echo = FALSE}
+#Trasnform into leaflet--------------
+nyc_biketrails_leaflet <- st_transform(bike_routes, 4326)
+bike_accidents_leaflet_sf <- 
+  st_transform(nyc_accidents, 4326)
+
+bins <- c(0, 20, 40, 60, Inf)
+pal <- colorBin(palette = "OrRd", domain = bike_accidents_leaflet$count, bins = bins)
+
+#Choropleth Map for Accidents with Bike Trails
+bike_accidents_leaflet <- leaflet(bike_accidents_leaflet_sf) %>%
+   addProviderTiles(providers$CartoDB.Positron) %>% 
+   addPolygons(fillColor = ~pal(bike_accidents_leaflet_sf$count), 
+               color = "black", weight = 1, dashArray = 2, fillOpacity = 1, opacity = 0.5) %>% 
+   addPolygons(data = nyc_biketrails_leaflet, color = "purple",
+               opacity = 0.7, weight = 0.5, fillOpacity = 0.2) %>% 
+    addLegend("bottomright", pal = pal, values = ~count,
+    title = "Bicycle Accidents in NYC", opacity = 1)
+
+bike_accidents_leaflet
+```
+
+
+
+# Choropleth Map of Each Borough
+```{r, echo = FALSE}
 mn_accidents <- left_join(mn_ntas, borough_accidents) %>% 
   filter(year=="2019" | year=="2020" | year=="2021")
 
@@ -156,25 +183,26 @@ bx_accidents <- bx_accidents %>%
   mutate(accident_count = cut(count, bx_qt$brks))
 
 #Creates maps for each borough dataframe-------------------------------------
-  
 #ggplot() +
-#  geom_sf(data= bike_borough_accidents_final, aes(fill = count), size = 0.5) +
-#  theme(panel.background = element_rect(fill = "aliceblue")) +
-#  facet_grid(~ borough_name)+ 
-#  scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
-#  labs(fill="Accident frequency",title="Bike accidents in NYC", subtitle = "Organized by neighborhood tabulation areas") +
-#  theme(axis.text.x = element_blank(),
-#        axis.text.y = element_blank(),
-#        axis.ticks = element_blank(),
-#        rect = element_blank())
+ # geom_sf(data=nyc_ntas) +
+  #geom_sf(data= nyc_accidents, aes(fill = accident_count), size = 0.5) +
+  #theme(panel.background = element_rect(fill = "aliceblue")) +
+  #facet_grid(~ borough_name) + 
+  #geom_sf(data = bike_routes, col = "black", fill = NA) +
+  #scale_fill_brewer(palette = "OrRd") +
+  #labs(fill="Accident frequency",title="Bike accidents in NYC", subtitle = "Organized by neighborhood tabulation areas") +
+  #theme(axis.text.x = element_blank(),
+   #    axis.text.y = element_blank(),
+    #    axis.ticks = element_blank(),
+     #   rect = element_blank())
 
 #Manhattan-------------------------------------
-
 ggplot() +
   geom_sf(data= mn_ntas) +
   geom_sf(data= mn_accidents, aes(fill = accident_count), size = 0.5) +
+  geom_sf(data = bike_routes, col = "black", fill = NA) +
   theme(panel.background = element_rect(fill = "aliceblue")) +
-  facet_grid(~ year)+ 
+  facet_grid(~ year) +
   scale_fill_brewer(palette = "OrRd") +
   labs(fill="Accident frequency",title="Bike accidents in Manhattan", subtitle = "Organized by neighborhood tabulation area") +
   theme(axis.text.x = element_blank(),
@@ -195,7 +223,7 @@ ggplot() +
         axis.ticks = element_blank(),
         rect = element_blank())
 
-#Queens (best borough)-------------------------------------
+#Queens-------------------------------------
 ggplot() +
   geom_sf(data=qns_ntas) +
   geom_sf(data= qns_accidents, aes(fill = accident_count)) +
@@ -236,19 +264,25 @@ ggplot() +
 
 ```
 
-# BarPlots
 
+
+
+
+
+
+
+
+
+# NYC Bicycle Accidents in 2019, 2020, & 2021
 ```{r, echo = FALSE}
-
+#Bargraphs for Accidents--------------------------------
 bike_borough_accidents_tibble <- st_set_geometry(bike_accidents_location, NULL) %>% 
   mutate(MonthName = month.abb[month])
 
 bike_accidents_tibble_2019 <- bike_borough_accidents_tibble %>% 
   filter(year == "2019") 
-
 bike_accidents_tibble_2020 <- bike_borough_accidents_tibble %>% 
   filter(year == "2020")
-
 bike_accidents_tibble_2021 <- bike_borough_accidents_tibble %>% 
   filter(year == "2021")
 
@@ -263,7 +297,6 @@ accidents_2019 <- ggplot(bike_accidents_tibble_2019,
   theme(legend.position = "none") +
   scale_fill_brewer(palette = "Set3")
 
-
 accidents_2020 <- ggplot(bike_accidents_tibble_2020, 
                          aes(x = factor(MonthName,levels=month.abb), fill = factor(MonthName))) + 
   geom_bar() +
@@ -274,7 +307,6 @@ accidents_2020 <- ggplot(bike_accidents_tibble_2020,
   scale_y_continuous(limits=c(0, 800)) +
   theme(legend.position = "none") +
   scale_fill_brewer(palette = "Set3")
-
 
 accidents_2021 <- ggplot(bike_accidents_tibble_2021, 
                          aes(x = factor(MonthName,levels=month.abb), fill = factor(MonthName))) + 
@@ -287,6 +319,7 @@ accidents_2021 <- ggplot(bike_accidents_tibble_2021,
   theme(legend.position = "none") +
   scale_fill_brewer(palette = "Set3")
 
+#Patchwork into one-------------------------------------
 accident_19_20 <- accidents_2019 /accidents_2020
 all_accident <- accident_19_20 / accidents_2021 +
   theme(plot.margin = margin(5.5, 5.5, 5.5, 35)) 

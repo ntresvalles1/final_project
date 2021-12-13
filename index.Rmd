@@ -1,5 +1,5 @@
 ---
-title: "My Final Project"
+title: "Bicycle Trails and Bicycle Accidents in New York City"
 author: "Nicole Tresvalles, Karen Galvan"
 date: "Last updated on `r Sys.Date()`"
 output:
@@ -41,25 +41,25 @@ library(patchwork)
 ```
 
 ```{r, echo = FALSE}
-# Filtered nyc accidents to bicyclist
+#Filtered nyc accidents to bicyclist--------------
 nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv") %>% 
   filter(PERSON_TYPE == "Bicyclist")
 
 people_injured <- nyc_accidents_filtered %>% 
   filter(PERSON_INJURY == "Injured") 
 
-# SF for Bike Routes
+#SF for Bike Routes--------------
 bike_routes <- "nyc_bike_routes" %>% 
   read_sf()
 
-# Maps for the boroughs
+#Maps for the boroughs--------------
 borough_ntas <- nyc_boundaries(
   geography = "nta",
   filter_by = "borough",
   region = c("brooklyn", "queens", "manhattan", "staten island", "bronx")
   )
 
-# Bike routes map
+#Bike routes map--------------
 ggplot() +
   geom_sf(data= borough_ntas) +
   geom_sf(data = bike_routes, col = "blue") +
