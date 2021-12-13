@@ -27,4 +27,59 @@ Write a second `more_info.html` page going more in-depth for people who want mor
 
 ```{r, echo = FALSE}
 
+bike_borough_accidents_tibble <- st_set_geometry(bike_accidents_location, NULL) %>% 
+  mutate(MonthName = month.abb[month])
+
+bike_accidents_tibble_2019 <- bike_borough_accidents_tibble %>% 
+  filter(year == "2019") 
+
+bike_accidents_tibble_2020 <- bike_borough_accidents_tibble %>% 
+  filter(year == "2020")
+
+bike_accidents_tibble_2021 <- bike_borough_accidents_tibble %>% 
+  filter(year == "2021")
+
+accidents_2019 <- ggplot(bike_accidents_tibble_2019, 
+                         aes(x = factor(MonthName,levels=month.abb), fill = factor(MonthName)))+ 
+  geom_bar() +
+  labs(x = NULL, y = NULL) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5), 
+        axis.line = element_line(colour = "darkblue", size = 1, linetype = "solid")) + 
+  ggtitle("Bicycle Accidents in 2019") +
+  scale_y_continuous(limits=c(0, 800)) +
+  theme(legend.position = "none") +
+  scale_fill_brewer(palette = "Set3")
+
+
+accidents_2020 <- ggplot(bike_accidents_tibble_2020, 
+                         aes(x = factor(MonthName,levels=month.abb), fill = factor(MonthName))) + 
+  geom_bar() +
+  labs(x = NULL, y = NULL) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5), 
+        axis.line = element_line(colour = "darkblue", size = 1, linetype = "solid")) + 
+  ggtitle("Bicycle Accidents in 2020") +
+  scale_y_continuous(limits=c(0, 800)) +
+  theme(legend.position = "none") +
+  scale_fill_brewer(palette = "Set3")
+
+
+accidents_2021 <- ggplot(bike_accidents_tibble_2021, 
+                         aes(x = factor(MonthName,levels=month.abb), fill = factor(MonthName))) + 
+  geom_bar() +
+  labs(x = NULL, y = NULL) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5), axis.line = element_line(colour = "darkblue", 
+                      size = 1, linetype = "solid")) + 
+  ggtitle("Bicycle Accidents in 2021") +
+  scale_y_continuous(limits=c(0, 800)) +
+  theme(legend.position = "none") +
+  scale_fill_brewer(palette = "Set3")
+
+accident_19_20 <- accidents_2019 /accidents_2020
+all_accident <- accident_19_20 / accidents_2021 +
+  theme(plot.margin = margin(5.5, 5.5, 5.5, 35)) 
+
+all <- patchwork::patchworkGrob(all_accident)
+gridExtra::grid.arrange(all, left = "Number of Bicyclist Injured", bottom = "Month")
+
+
 ```

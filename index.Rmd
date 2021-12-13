@@ -36,8 +36,7 @@ library(nycgeo)
 library(leaflet)
 library(lubridate)
 library(readr)
-
-#library(rgeos)
+library(patchwork)
 ```
 
 ```{r, echo = FALSE}
@@ -254,3 +253,8 @@ ggplot() +
         rect = element_blank())
 
 ```
+
+
+
+
+
