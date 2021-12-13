@@ -36,8 +36,7 @@ library(nycgeo)
 library(leaflet)
 library(lubridate)
 library(readr)
-
-#library(rgeos)
+library(patchwork)
 ```
 
 ```{r, echo = FALSE}
@@ -114,7 +113,7 @@ bike_borough_accidents_final <- bike_borough_accidents_final %>%
 ggplot() +
   geom_sf(data= bike_borough_accidents_final, aes(fill = count), size = 0.5) +
   theme(panel.background = element_rect(fill = "aliceblue")) +
-  facet_grid(~ borough)+ 
+  facet_grid(~ borough_name)+ 
   scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
   labs(fill="Accident frequency",title="Bike accidents in NYC", subtitle = "Organized by public use microdata areas") +
   theme(axis.text.x = element_blank(),
@@ -122,3 +121,8 @@ ggplot() +
         axis.ticks = element_blank(),
         rect = element_blank())
 ```
+
+
+
+
+
