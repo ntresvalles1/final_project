@@ -25,8 +25,6 @@ Write a second `more_info.html` page going more in-depth for people who want mor
 1. Between 2-3 more visualizations.
 2. No more than 500 words of text
 
-# Choropleth Map of Each Borough
-
 To start, we wanted to know where bike accidents are happening. 
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 bicycle_accidents <- read_csv('accidents_bicyclists_.csv')
@@ -139,7 +137,7 @@ bike_accidents_leaflet
 
 
 # Choropleth Map of Each Borough
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 mn_accidents <- left_join(mn_ntas, borough_accidents) %>% 
   filter(year=="2019" | year=="2020" | year=="2021")
 
@@ -205,7 +203,6 @@ bx_accidents <- bx_accidents %>%
 ggplot() +
   geom_sf(data= mn_ntas) +
   geom_sf(data= mn_accidents, aes(fill = accident_count), size = 0.5) +
-  geom_sf(data = bike_routes, col = "black", fill = NA) +
   theme(panel.background = element_rect(fill = "aliceblue")) +
   facet_grid(~ year) +
   scale_fill_brewer(palette = "OrRd") +
@@ -371,17 +368,31 @@ accident_factors_21 <- accident_factors_21[-c(10),]
 
 
 #Bar graphs----------------------------------------------------------
+
 ggplot(accident_factors_19, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
   geom_col(fill="light blue") + 
-  coord_flip() 
+  coord_flip() + 
+  labs(
+    title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2019", 40),
+    x = "Contributing Factors",
+    y= "Total Count")
 
 ggplot(accident_factors_20, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
   geom_col(fill="light blue") + 
-  coord_flip()
+  coord_flip() + 
+  labs(
+    title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2020", 40),
+    x = "Contributing Factors",
+    y= "Total Count")
 
 ggplot(accident_factors_21, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
   geom_col(fill="light blue") + 
-  coord_flip()
+  coord_flip() + 
+  labs(
+    title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2021", 40),
+    x = "Contributing Factors",
+    y= "Total Count")
+
 
 
 ```

@@ -1,9 +1,5 @@
 ---
-<<<<<<< HEAD
 title: "Bicycle Trails and Bicycle Accidents in New York City"
-=======
-title: "Bike Routes in NYC"
->>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
 author: "Nicole Tresvalles, Karen Galvan"
 date: "Last updated on `r Sys.Date()`"
 output:
@@ -20,7 +16,7 @@ Comments in HTML are like this!
 
 # Bike Routes and Bike Accidents in NYC
 
-## Where the routes at?
+### Where the routes at?
 
 
 Biking is an integral part of New York City's modes of transportation Over the decades, city officials have invested in biking infrastructure, and as of 2020, there are 1,375 miles of bike lanes have been installed, 546 of them being protected. Since 2009, NYC has seen a growth in daily cycling of 110% to 2019 - a figure likely to grow as an increasing population of commuters begin to turn to biking as an alternative to crowded subway spaces.^[https://www1.nyc.gov/html/dot/downloads/pdf/cycling-in-the-city-2021.pdf] 
@@ -44,17 +40,12 @@ library(lubridate)
 library(readr)
 library(classInt)
 library(patchwork)
+library(stringr)
 ```
-
-<<<<<<< HEAD
-```{r, echo = FALSE}
-#Filtered nyc accidents to bicyclist--------------
-=======
 
 
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 # Filtered nyc accidents to bicyclist
->>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
 nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv") %>% 
   filter(PERSON_TYPE == "Bicyclist")
 
@@ -75,12 +66,11 @@ borough_ntas <- nyc_boundaries(
 
 
 
-<<<<<<< HEAD
-#Bike routes map--------------
-=======
+# Bike routes map
+
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 # Bike routes map
->>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
+
 ggplot() +
   geom_sf(data= borough_ntas) +
   geom_sf(data = bike_routes, col = "blue") +
