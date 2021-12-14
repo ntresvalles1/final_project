@@ -12,18 +12,9 @@ output:
 
 <!-- put space -->
 <p>&nbsp;</p>
-# SECTION NAME
+# Overview
 
-Write your "more information" section here.
-
-## Subsection name
-
-Write a second `more_info.html` page going more in-depth for people who want more details. In should have
-
-1. Between 2-3 more visualizations.
-2. No more than 500 words of text
-
-To start, we wanted to know where bike accidents are happening. 
+To start, we wanted to know the location of both the bicycle trails and the bike accidents. Below, we compiled several different maps to show when, where, and why the accidents are happening. Upon getting results, we found an apparent pattern with several variables, such as path locations, year, accidents frequency, and contributing factors.
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 bicycle_accidents <- read_csv('accidents_bicyclists_.csv')
 
@@ -111,7 +102,8 @@ nyc_accidents <- nyc_accidents %>%
 
 <!-- put space -->
 <p>&nbsp;</p>
-# Leaflet Map of Bicycle Trails
+# Leaflet of Bicycle Trails and Accidents
+This visualizes the current bicycle paths and accidents in the city, as reported by the NYC government. Manhattan, the borough with the most accidents, also has the most bicycle trails. Furthermore, as we go further out from the center of NYC, both the accidents and paths decrease. Thus, there must be a correlation with the concentration of trails to the amount of accidents that occur. 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 #Transform into leaflet--------------
 nyc_biketrails_leaflet <- st_transform(bike_routes, 4326)
@@ -124,7 +116,7 @@ pal <- colorBin(palette = "OrRd", domain = bike_accidents_leaflet_sf$count, bins
 bike_accidents_leaflet <- leaflet(bike_accidents_leaflet_sf) %>%
    addProviderTiles(providers$CartoDB.Positron) %>% 
    addPolygons(fillColor = ~pal(bike_accidents_leaflet_sf$count), 
-               color = "black", weight = 1, dashArray = 2, fillOpacity = 1, opacity = 0.5) %>% 
+               color = "black", weight = 1, fillOpacity = 1, opacity = 0.5) %>% #dashArray = 2,
    addPolygons(data = nyc_biketrails_leaflet, color = "purple",
                opacity = 0.7, weight = 0.5, fillOpacity = 0.2) %>% 
     addLegend("bottomright", pal = pal, values = ~count,
@@ -283,9 +275,12 @@ ggplot() +
 ```
 
 
-
-
 # When are these accidents happening?
+The graph below analyzes accident frequency during the months leading up to, before, and after the pandemic. Although the data differs between each year, there seems to be similarities with the overall shape, such as the increase in accidents after April as summer approaches and a decrease after September as it gets colder. 
+
+Comparing 2020 to 2019, there were more overall accidents in 2020, specifically from June to October. Besides the approaching summer weather, June of 2020 was the peak of the pandemic. 
+
+Though lockdown was implemented, this could have contributed to the increase in accidents since people were too afraid to use public transportation, such as cabs and the subway. As well as the increase in bicycle paths, following the "Green Wave". Furthermore, bicycle accidents between 2020 and 2021 decreased, and most likely due to COVID cases decreasing and people slowly starting to gain more confidence in using public transportation, once again. 
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 # NYC Bicycle Accidents in 2019, 2020, & 2021--------------------------------
 bike_borough_accidents_tibble <- st_set_geometry(bike_accidents_location, NULL) %>% 
@@ -379,7 +374,8 @@ ggplot(accident_factors_19, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.
   labs(
     title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2019", 40),
     x = "Contributing Factors",
-    y= "Total Count")
+    y= "Total Count") +
+    geom_text(aes(label = count), size = 3, hjust = 1.1, colour = "black")
 
 ggplot(accident_factors_20, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
   geom_col(fill="light blue") + 
@@ -387,7 +383,8 @@ ggplot(accident_factors_20, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.
   labs(
     title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2020", 40),
     x = "Contributing Factors",
-    y= "Total Count")
+    y= "Total Count") +
+    geom_text(aes(label = count), size = 3, hjust = 1.1, colour = "black")
 
 ggplot(accident_factors_21, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
   geom_col(fill="light blue") + 
@@ -395,6 +392,7 @@ ggplot(accident_factors_21, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.
   labs(
     title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2021", 40),
     x = "Contributing Factors",
-    y= "Total Count")
+    y= "Total Count") +
+    geom_text(aes(label = count), size = 3, hjust = 1.1, colour = "black")
 
 ```
