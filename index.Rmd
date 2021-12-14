@@ -1,5 +1,9 @@
 ---
+<<<<<<< HEAD
 title: "Bicycle Trails and Bicycle Accidents in New York City"
+=======
+title: "Bike Routes in NYC"
+>>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
 author: "Nicole Tresvalles, Karen Galvan"
 date: "Last updated on `r Sys.Date()`"
 output:
@@ -14,16 +18,18 @@ output:
 Comments in HTML are like this! 
 -->
 
-# SECTION NAME Sec-01
+# Bike Routes and Bike Accidents in NYC
 
-## Subsection name 
+## Where the routes at?
 
-Write an intro `index.html` page in blog-post style that summarizes your work. It should have
 
-1. One visualization that best summarizes your work.
-1. No more than 200 words of text
+Biking is an integral part of New York City's modes of transportation Over the decades, city officials have invested in biking infrastructure, and as of 2020, there are 1,375 miles of bike lanes have been installed, 546 of them being protected. Since 2009, NYC has seen a growth in daily cycling of 110% to 2019 - a figure likely to grow as an increasing population of commuters begin to turn to biking as an alternative to crowded subway spaces.^[https://www1.nyc.gov/html/dot/downloads/pdf/cycling-in-the-city-2021.pdf] 
 
-```{r, echo = FALSE}
+However, the biking commute is not rosy - unfortunately, the city sees a number of cyclist injuries and deaths every year as a result of motor vehicle collisions. In fact, 2019 saw a total of 28 deaths, the deadliest year for cyclists in two decades.^[https://www.nytimes.com/2020/03/14/nyregion/coronavirus-nyc-bike-commute.html]. Spurred into action by these casualties, New York City officials announced the “Green Wave” safety plan, with its goal to increase the number of practiced bike lanes miles annually. 
+
+Thus, our project seeks to visualize when, where, and why these accidents are happening in a pre and post-COVID world and analyze how "Green Wave" has affected cyclists since its implementation. 
+
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
 library(tidyverse)
 library(sf)
 library(httr)
@@ -40,8 +46,15 @@ library(classInt)
 library(patchwork)
 ```
 
+<<<<<<< HEAD
 ```{r, echo = FALSE}
 #Filtered nyc accidents to bicyclist--------------
+=======
+
+
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
+# Filtered nyc accidents to bicyclist
+>>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
 nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv") %>% 
   filter(PERSON_TYPE == "Bicyclist")
 
@@ -58,18 +71,20 @@ borough_ntas <- nyc_boundaries(
   filter_by = "borough",
   region = c("brooklyn", "queens", "manhattan", "staten island", "bronx")
   )
+```
 
+
+
+<<<<<<< HEAD
 #Bike routes map--------------
+=======
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
+# Bike routes map
+>>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
 ggplot() +
   geom_sf(data= borough_ntas) +
   geom_sf(data = bike_routes, col = "blue") +
   theme(panel.background = element_rect(fill = "aliceblue"))
   
 ```
-
-
-
-
-
-
 

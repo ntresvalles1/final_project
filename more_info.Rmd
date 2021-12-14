@@ -25,7 +25,10 @@ Write a second `more_info.html` page going more in-depth for people who want mor
 1. Between 2-3 more visualizations.
 2. No more than 500 words of text
 
-```{r, echo = FALSE}
+# Choropleth Map of Each Borough
+
+To start, we wanted to know where bike accidents are happening. 
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
 bicycle_accidents <- read_csv('accidents_bicyclists_.csv')
 
 #Filters out bike accidents without proper latitude/longitude--------------
@@ -113,14 +116,13 @@ nyc_accidents <- nyc_accidents %>%
 
 
 # Leaflet Map of Bicycle Trails
-```{r, echo = FALSE}
-#Trasnform into leaflet--------------
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#Transform into leaflet--------------
 nyc_biketrails_leaflet <- st_transform(bike_routes, 4326)
-bike_accidents_leaflet_sf <- 
-  st_transform(nyc_accidents, 4326)
+bike_accidents_leaflet_sf <- st_transform(nyc_accidents, 4326)
 
 bins <- c(0, 20, 40, 60, Inf)
-pal <- colorBin(palette = "OrRd", domain = bike_accidents_leaflet$count, bins = bins)
+pal <- colorBin(palette = "OrRd", domain = bike_accidents_leaflet_sf$count, bins = bins)
 
 #Choropleth Map for Accidents with Bike Trails
 bike_accidents_leaflet <- leaflet(bike_accidents_leaflet_sf) %>%
@@ -136,7 +138,6 @@ bike_accidents_leaflet
 ```
 
 
-
 # Choropleth Map of Each Borough
 ```{r, echo = FALSE}
 mn_accidents <- left_join(mn_ntas, borough_accidents) %>% 
@@ -145,7 +146,6 @@ mn_accidents <- left_join(mn_ntas, borough_accidents) %>%
 mn_qt <- classIntervals(c(min(mn_accidents$count), mn_accidents$count), n = 5, style = "pretty")
 mn_accidents <- mn_accidents %>%
   mutate(accident_count = cut(count, mn_qt$brks))
-
 
 
 qns_accidents <- left_join(qns_ntas, borough_accidents) %>% 
@@ -196,6 +196,11 @@ bx_accidents <- bx_accidents %>%
     #    axis.ticks = element_blank(),
      #   rect = element_blank())
 
+```
+
+
+# Manhattan
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Manhattan-------------------------------------
 ggplot() +
   geom_sf(data= mn_ntas) +
@@ -209,7 +214,11 @@ ggplot() +
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         rect = element_blank())
+```
 
+
+# The Bronx
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Bronx-------------------------------------
 ggplot() +
   geom_sf(data= bx_ntas) +
@@ -222,8 +231,12 @@ ggplot() +
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         rect = element_blank())
+```
 
-#Queens-------------------------------------
+
+# Queens
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
+#Queens (best borough)-------------------------------------
 ggplot() +
   geom_sf(data=qns_ntas) +
   geom_sf(data= qns_accidents, aes(fill = accident_count)) +
@@ -235,7 +248,10 @@ ggplot() +
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         rect = element_blank())
+```
 
+# Brooklyn
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Brooklyn-------------------------------------
 ggplot() +
   geom_sf(data=bk_ntas) +
@@ -248,7 +264,11 @@ ggplot() +
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         rect = element_blank())
+```
 
+
+# Staten Island
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Staten Island-------------------------------------
 ggplot() +
   geom_sf(data= stat_ntas) +
@@ -267,15 +287,9 @@ ggplot() +
 
 
 
-
-
-
-
-
-
-# NYC Bicycle Accidents in 2019, 2020, & 2021
-```{r, echo = FALSE}
-#Bargraphs for Accidents--------------------------------
+# When are these accidents happening?
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
+# NYC Bicycle Accidents in 2019, 2020, & 2021--------------------------------
 bike_borough_accidents_tibble <- st_set_geometry(bike_accidents_location, NULL) %>% 
   mutate(MonthName = month.abb[month])
 
@@ -326,6 +340,48 @@ all_accident <- accident_19_20 / accidents_2021 +
 
 all <- patchwork::patchworkGrob(all_accident)
 gridExtra::grid.arrange(all, left = "Number of Bicyclist Injured", bottom = "Month")
+
+
+```
+
+# Why are these accidents happening?
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
+#Gathers top 6 factors for collision------------------------------------
+accident_factors_19 <- bike_accidents_tibble_2019 %>% 
+  group_by(CONTRIBUTING.FACTOR.VEHICLE.1) %>%
+  summarise(count = n()) %>% 
+  top_n(11) 
+
+
+accident_factors_20 <- bike_accidents_tibble_2020 %>% 
+  group_by(CONTRIBUTING.FACTOR.VEHICLE.1) %>%
+  summarise(count = n()) %>% 
+  top_n(11)
+
+accident_factors_21 <- bike_accidents_tibble_2021 %>% 
+  group_by(CONTRIBUTING.FACTOR.VEHICLE.1) %>%
+  summarise(count = n()) %>% 
+  top_n(11) 
+
+#Deletes "unspecified" factors-------------------------------------------
+accident_factors_19 <- accident_factors_19[-c(10),] 
+accident_factors_20 <- accident_factors_20[-c(11),] 
+accident_factors_21 <- accident_factors_21[-c(10),] 
+
+
+
+#Bar graphs----------------------------------------------------------
+ggplot(accident_factors_19, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
+  geom_col(fill="light blue") + 
+  coord_flip() 
+
+ggplot(accident_factors_20, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
+  geom_col(fill="light blue") + 
+  coord_flip()
+
+ggplot(accident_factors_21, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
+  geom_col(fill="light blue") + 
+  coord_flip()
 
 
 ```

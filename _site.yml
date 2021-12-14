@@ -7,16 +7,16 @@ output:
     toc: yes
     toc_float: yes
     toc_depth: 2
-    theme: cosmo
+    theme: journal
     highlight: tango
     df_print: paged
     lib_dir: site_libs
     self_contained: no
 # All fa icons were obtained from https://fontawesome.com/icons?d=gallery
 navbar:
-  title: "Final Project Title"
+  title: "Bike Routes and Bike Accidents in NYC"
   left:
-    - text: "Blogpost"
+    - text: "Intro"
       href: index.html
     - text: "More info"
       href: more_info.html
