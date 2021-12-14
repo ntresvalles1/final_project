@@ -1,9 +1,5 @@
 ---
-<<<<<<< HEAD
-title: "Bicycle Trails and Bicycle Accidents in New York City"
-=======
-title: "Bike Routes in NYC"
->>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
+title: "Bicycle Trails and Accidents in New York City"
 author: "Nicole Tresvalles, Karen Galvan"
 date: "Last updated on `r Sys.Date()`"
 output:
@@ -18,12 +14,12 @@ output:
 Comments in HTML are like this! 
 -->
 
+<p>&nbsp;</p>
+
 # Bike Routes and Bike Accidents in NYC
 
-## Where the routes at?
-
-
-Biking is an integral part of New York City's modes of transportation Over the decades, city officials have invested in biking infrastructure, and as of 2020, there are 1,375 miles of bike lanes have been installed, 546 of them being protected. Since 2009, NYC has seen a growth in daily cycling of 110% to 2019 - a figure likely to grow as an increasing population of commuters begin to turn to biking as an alternative to crowded subway spaces.^[https://www1.nyc.gov/html/dot/downloads/pdf/cycling-in-the-city-2021.pdf] 
+### Where are the routes?
+Biking is an integral part of New York City's modes of transportation. Over the decades, city officials have invested in biking infrastructure, and as of 2020, there are 1,375 miles of bike lanes have been installed, 546 of them being protected. Since 2009, NYC has seen a growth in daily cycling of 110% to 2019 - a figure likely to grow as an increasing population of commuters begin to turn to biking as an alternative to crowded subway spaces.^[https://www1.nyc.gov/html/dot/downloads/pdf/cycling-in-the-city-2021.pdf] 
 
 However, the biking commute is not rosy - unfortunately, the city sees a number of cyclist injuries and deaths every year as a result of motor vehicle collisions. In fact, 2019 saw a total of 28 deaths, the deadliest year for cyclists in two decades.^[https://www.nytimes.com/2020/03/14/nyregion/coronavirus-nyc-bike-commute.html]. Spurred into action by these casualties, New York City officials announced the “Green Wave” safety plan, with its goal to increase the number of practiced bike lanes miles annually. 
 
@@ -46,15 +42,8 @@ library(classInt)
 library(patchwork)
 ```
 
-<<<<<<< HEAD
-```{r, echo = FALSE}
-#Filtered nyc accidents to bicyclist--------------
-=======
-
-
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
-# Filtered nyc accidents to bicyclist
->>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
+#Filtered nyc accidents to bicyclist--------------
 nyc_accidents_filtered = readr::read_csv("Motor_Vehicle_Collisions_-_Person.csv") %>% 
   filter(PERSON_TYPE == "Bicyclist")
 
@@ -74,17 +63,11 @@ borough_ntas <- nyc_boundaries(
 ```
 
 
-
-<<<<<<< HEAD
-#Bike routes map--------------
-=======
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
-# Bike routes map
->>>>>>> 75328fc1a1c0c4e65166bee96c3c3e067c561f52
+# Bike routes map--------------
 ggplot() +
   geom_sf(data= borough_ntas) +
   geom_sf(data = bike_routes, col = "blue") +
   theme(panel.background = element_rect(fill = "aliceblue"))
-  
 ```
 
