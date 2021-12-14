@@ -10,13 +10,11 @@ output:
     df_print: kable
 ---
 
-<!--
-Comments in HTML are like this! 
--->
+<!-- put space --> 
 
 <p>&nbsp;</p>
 
-# Bike Routes and Bike Accidents in NYC
+# Bike Routes and Accidents in NYC
 
 ### Where are the routes?
 Biking is an integral part of New York City's modes of transportation. Over the decades, city officials have invested in biking infrastructure, and as of 2020, there are 1,375 miles of bike lanes have been installed, 546 of them being protected. Since 2009, NYC has seen a growth in daily cycling of 110% to 2019 - a figure likely to grow as an increasing population of commuters begin to turn to biking as an alternative to crowded subway spaces.^[https://www1.nyc.gov/html/dot/downloads/pdf/cycling-in-the-city-2021.pdf] 
@@ -40,7 +38,9 @@ library(lubridate)
 library(readr)
 library(classInt)
 library(patchwork)
+library(stringr)
 ```
+
 
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Filtered nyc accidents to bicyclist--------------
@@ -64,7 +64,8 @@ borough_ntas <- nyc_boundaries(
 
 
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
-# Bike routes map--------------
+# Bike routes map
+
 ggplot() +
   geom_sf(data= borough_ntas) +
   geom_sf(data = bike_routes, col = "blue") +

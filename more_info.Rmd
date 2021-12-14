@@ -23,7 +23,6 @@ Write a second `more_info.html` page going more in-depth for people who want mor
 1. Between 2-3 more visualizations.
 2. No more than 500 words of text
 
-
 To start, we wanted to know where bike accidents are happening. 
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 bicycle_accidents <- read_csv('accidents_bicyclists_.csv')
@@ -112,7 +111,7 @@ nyc_accidents <- nyc_accidents %>%
 
 <!-- put space -->
 <p>&nbsp;</p>
-## Leaflet Map of Bicycle Trails
+# Leaflet Map of Bicycle Trails
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 #Transform into leaflet--------------
 nyc_biketrails_leaflet <- st_transform(bike_routes, 4326)
@@ -134,9 +133,11 @@ bike_accidents_leaflet <- leaflet(bike_accidents_leaflet_sf) %>%
 bike_accidents_leaflet
 ```
 
+
 <!-- put space -->
 <p>&nbsp;</p>
-## Choropleth Map of Each Borough
+
+# Choropleth Map of Each Borough
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 mn_accidents <- left_join(mn_ntas, borough_accidents) %>% 
   filter(year=="2019" | year=="2020" | year=="2021")
@@ -197,7 +198,7 @@ bx_accidents <- bx_accidents %>%
 ```
 
 
-### Manhattan
+## Manhattan
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Manhattan-------------------------------------
 ggplot() +
@@ -214,7 +215,7 @@ ggplot() +
 ```
 
 
-### The Bronx
+## The Bronx
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Bronx-------------------------------------
 ggplot() +
@@ -231,7 +232,7 @@ ggplot() +
 ```
 
 
-### Queens
+## Queens
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Queens (best borough)-------------------------------------
 ggplot() +
@@ -247,7 +248,7 @@ ggplot() +
         rect = element_blank())
 ```
 
-### Brooklyn
+## Brooklyn
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Brooklyn-------------------------------------
 ggplot() +
@@ -264,7 +265,7 @@ ggplot() +
 ```
 
 
-### Staten Island
+## Staten Island
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Staten Island-------------------------------------
 ggplot() +
@@ -284,7 +285,7 @@ ggplot() +
 
 
 
-## When are these accidents happening?
+# When are these accidents happening?
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 # NYC Bicycle Accidents in 2019, 2020, & 2021--------------------------------
 bike_borough_accidents_tibble <- st_set_geometry(bike_accidents_location, NULL) %>% 
@@ -343,6 +344,7 @@ gridExtra::grid.arrange(all, left = "Number of Bicyclist Injured", bottom = "Mon
 
 <!-- put space -->
 <p>&nbsp;</p>
+
 # Why are these accidents happening?
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #Gathers top 6 factors for collision------------------------------------
@@ -370,16 +372,29 @@ accident_factors_21 <- accident_factors_21[-c(10),]
 
 
 #Bar graphs----------------------------------------------------------
+
 ggplot(accident_factors_19, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
   geom_col(fill="light blue") + 
-  coord_flip() 
+  coord_flip() + 
+  labs(
+    title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2019", 40),
+    x = "Contributing Factors",
+    y= "Total Count")
 
 ggplot(accident_factors_20, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
   geom_col(fill="light blue") + 
-  coord_flip()
+  coord_flip() + 
+  labs(
+    title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2020", 40),
+    x = "Contributing Factors",
+    y= "Total Count")
 
 ggplot(accident_factors_21, mapping=aes(x = reorder(CONTRIBUTING.FACTOR.VEHICLE.1, count), y=count)) + 
   geom_col(fill="light blue") + 
-  coord_flip()
+  coord_flip() + 
+  labs(
+    title = str_wrap("Top 10 Contributing Factors of Accidents Involving Cyclists in 2021", 40),
+    x = "Contributing Factors",
+    y= "Total Count")
 
 ```
